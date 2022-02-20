@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class CustomerRegistrationService {
@@ -17,7 +18,7 @@ public class CustomerRegistrationService {
 
     public void registerNewCustomer(CustomerRegistrationRequest request) {
         // 1. PhoneNumber is taken?
-        final String phoneNumber = request.getCustomer().getPhoneNumber();
+        String phoneNumber = request.getCustomer().getPhoneNumber();
         Optional<Customer> customerOptional = customerRepo.selectCustomerByPhoneNumber(phoneNumber);
         if(customerOptional.isPresent()) {
             // - 1.1 if taken and belongs to same customer (saving customer twice)  -> return customer
@@ -27,7 +28,11 @@ public class CustomerRegistrationService {
                 return; //just the customer is already registered
             }
                 // - 1.2 if no same customer -> throw exception
-                throw new IllegalStateException(String.format("Phone number [s%] already taken!", phoneNumber));
+                throw new IllegalStateException(String.format("Phone number [%s] already taken!", phoneNumber));
+        }
+
+        if(request.getCustomer().getId() == null) {
+            request.getCustomer().setId(UUID.randomUUID());
         }
         // 2. else Save customer
         customerRepo.save(request.getCustomer());
