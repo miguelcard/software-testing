@@ -6,18 +6,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class PaymentService {
 
+    private static final List<Currency> ACCEPTED_CURRENCIES = List.of(Currency.USD, Currency.GBP);
+
     private final PaymentRepository paymentRepo;
     private final CustomerRepository customerRepo;
     private final CardPaymentCharger paymentCharger;
 
     @Autowired
-    public PaymentService(PaymentRepository paymentRepo, CustomerRepository customerRepo, CardPaymentCharger paymentCharger) {
+    public PaymentService(PaymentRepository paymentRepo, CustomerRepository customerRepo, CardPaymentCharger paymentCharger) { // this doesnt show error in amigos code
         this.paymentRepo = paymentRepo;
         this.customerRepo = customerRepo;
         this.paymentCharger = paymentCharger;
@@ -37,11 +40,17 @@ public class PaymentService {
             throw new IllegalStateException(String.format("User with id [%s] not found!", customerId));
         }
         Payment payment = request.getPayment();
-        if(!Arrays.stream(Currency.values()).anyMatch(currency -> currency.equals(payment.getCurrency()))){
+        if(!ACCEPTED_CURRENCIES.stream().anyMatch(currency -> currency.equals(payment.getCurrency()))){
             throw new IllegalStateException(String.format("Currency not supported [%s] ", payment.getCurrency().toString()));
         }
 
-        CardCharge charge = paymentCharger.chargeCard(payment.getAmount(), payment.getCurrency(), payment.getSource(), payment.getDescription());
+        CardCharge charge = paymentCharger.chargeCard(
+                payment.getAmount(),
+                payment.getCurrency(),
+                payment.getSource(),
+                payment.getDescription()
+        );
+
         if(!charge.isWasCharged()) {
             throw new IllegalStateException("Card was not charged!");
         }

@@ -10,7 +10,7 @@ import javax.validation.constraints.NotBlank;
 import java.util.UUID;
 
 @Entity
-@JsonIgnoreProperties( value = {"id"}, allowGetters = true) // ignores id comming from client but getters are present (retrieves id to client)
+@JsonIgnoreProperties( allowGetters = true) // (ignores id comming from client) but getters are present (retrieves id to client)
 public class Customer {
 
     @Id
