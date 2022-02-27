@@ -36,7 +36,7 @@ public class PaymentIntegrationTest {
     void itShouldCreatePaymentSuccessfully() throws Exception {
         // Given
         UUID customerId = UUID.randomUUID();
-        Customer customer = new Customer(customerId, "Pepito",  "6667");
+        Customer customer = new Customer(customerId, "Pepito",  "+43 6766222222");
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(customer);
         //
         ResultActions customerRegResultActions = mockMvc.perform(put("/api/v1/customer-registration")

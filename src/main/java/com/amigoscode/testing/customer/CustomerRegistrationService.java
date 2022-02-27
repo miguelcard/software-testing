@@ -1,5 +1,6 @@
 package com.amigoscode.testing.customer;
 
+import com.amigoscode.testing.utils.PhoneNumberValidator;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -10,15 +11,23 @@ import java.util.UUID;
 public class CustomerRegistrationService {
 
     private final CustomerRepository customerRepo;
+    private final PhoneNumberValidator phoneValidator;
 
     @Autowired
-    public CustomerRegistrationService(CustomerRepository customerRepo) {
+    public CustomerRegistrationService(CustomerRepository customerRepo, PhoneNumberValidator phoneValidator) {
         this.customerRepo = customerRepo;
+        this.phoneValidator = phoneValidator;
     }
 
     public void registerNewCustomer(CustomerRegistrationRequest request) {
         // 1. PhoneNumber is taken?
         String phoneNumber = request.getCustomer().getPhoneNumber();
+
+        // Validate phone number
+        if(!phoneValidator.test(phoneNumber)) {
+            throw new IllegalStateException(String.format("the phone number %s is invalid", phoneNumber));
+        }
+
         Optional<Customer> customerOptional = customerRepo.selectCustomerByPhoneNumber(phoneNumber);
         if(customerOptional.isPresent()) {
             // - 1.1 if taken and belongs to same customer (saving customer twice)  -> return customer
