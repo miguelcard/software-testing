@@ -38,7 +38,7 @@ public class PaymentIntegrationTest {
         UUID customerId = UUID.randomUUID();
         Customer customer = new Customer(customerId, "Pepito",  "+43 6766222222");
         CustomerRegistrationRequest request = new CustomerRegistrationRequest(customer);
-        //
+        // when
         ResultActions customerRegResultActions = mockMvc.perform(put("/api/v1/customer-registration")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content(Objects.requireNonNull(ObjectToJson(request)))
@@ -66,7 +66,7 @@ public class PaymentIntegrationTest {
         // test payment
         paymentResultActions.andExpect(status().isOk());
         // compare against DB
-        // TODO: this assertion is to be done by other enpoint like .../payments/
+        // TODO: this assertion is to be done by other enpoint like get .../payments/
         assertThat(paymentRepo.findById(paymentId)).isPresent().hasValueSatisfying(  //Asserting POST like methods
                 p -> assertThat(p).isEqualToComparingFieldByField(payment)
         );
